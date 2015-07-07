@@ -19,68 +19,97 @@
     android:background="?attr/selectableItemBackground"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
     android:paddingBottom="7dip"
     android:paddingLeft="10dip"
     android:paddingRight="5dip"
     android:paddingTop="5dip">
 
-    <TextView
-        android:id="@+id/DeckPickerExpander"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/deck_item_name"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:textSize="20sp"
-        android:layout_centerVertical="true"/>
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <TextView
+            android:id="@+id/DeckPickerExpander"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:textSize="20sp"/>
 
-    <TextView
-        android:id="@+id/DeckPickerName"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/DeckPickerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:maxLines="2"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/DeckPickerExpander"
-        android:layout_toLeftOf="@+id/deckpicker_new"
-        android:background="@color/transparent"
-        android:gravity="left"
-        android:maxLines="2"
-        android:textColor="?android:textColorPrimary"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/deckpicker_new"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/deckpicker_lrn"
-        android:background="@color/transparent"
-        android:gravity="center"
-        android:paddingRight="5dip"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/deckpicker_lrn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_gravity="center"
-        android:layout_toLeftOf="@+id/deckpicker_rev"
-        android:background="@color/transparent"
-        android:gravity="center"
-        android:paddingRight="5dip"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/deckpicker_rev"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/deck_item_name"
+        android:layout_toRightOf="@id/deck_item_name"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_gravity="center"
-        android:layout_marginRight="6dip"
-        android:background="@color/transparent"
-        android:gravity="center"
-        android:textSize="14sp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <TextView
+            android:id="@+id/deckpicker_new"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:gravity="center"
+            android:paddingEnd="5dip"
+            android:paddingRight="5dip"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/deckpicker_lrn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:background="@color/transparent"
+            android:paddingEnd="5dip"
+            android:paddingRight="5dip"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/deckpicker_rev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingEnd="5dip"
+            android:paddingRight="5dip"
+            android:background="@color/transparent"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/deck_picker_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/deck_picker_option_study"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:gravity="start"
+            android:maxLines="2"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:text="STUDY"/>
+    </LinearLayout>
+
 </RelativeLayout>

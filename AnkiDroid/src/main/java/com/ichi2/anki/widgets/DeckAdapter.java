@@ -5,17 +5,20 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.v7.widget.RecyclerView;
 import android.view.*;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.LinearInterpolator;
 import android.widget.*;
 
 import com.ichi2.anki.CollectionHelper;
 import com.ichi2.anki.R;
 import com.ichi2.libanki.*;
+import com.nineoldandroids.animation.ValueAnimator;
 
 import java.util.List;
 
 import timber.log.Timber;
 
-public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> {
+public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> implements View.OnClickListener {
 
     private LayoutInflater mLayoutInflater;
     private List<Sched.DeckDueTreeNode> mDeckList;
@@ -27,6 +30,7 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> {
     private View.OnClickListener mDeckExpanderClickListener;
     private View.OnLongClickListener mDeckLongClickListener;
     private Context mContext;
+    private int mOriginalHeight = 0;
 
     // ViewHolder class to save inflated views for recycling
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -34,6 +38,9 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> {
         public TextView mDeckExpander;
         public TextView mDeckName;
         public TextView mDeckNew, mDeckLearn, mDeckRev;
+        public LinearLayout mDeckOptions;
+
+        public boolean mIsExpanded;
 
         public ViewHolder(View v) {
             super(v);
@@ -43,6 +50,8 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> {
             mDeckNew = (TextView) v.findViewById(R.id.deckpicker_new);
             mDeckLearn = (TextView) v.findViewById(R.id.deckpicker_lrn);
             mDeckRev = (TextView) v.findViewById(R.id.deckpicker_rev);
+            mDeckOptions = (LinearLayout) v.findViewById(R.id.deck_picker_options);
+            mIsExpanded = false;
         }
     }
 
@@ -78,7 +87,10 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> {
     @Override
     public DeckAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = mLayoutInflater.inflate(R.layout.deck_item, parent, false);
-        return new ViewHolder(v);
+        ViewHolder vh = new ViewHolder(v);
+        vh.mDeckLayout.setOnClickListener(this);
+
+        return vh;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -119,16 +131,63 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> {
                 zeroCountColor : reviewCountColor);
 
         // store deck ID in layout's tag, for easy retrieval in our click listeners
-        holder.mDeckLayout.setTag(node.did);
+        //holder.mDeckLayout.setTag(node.did);
+        holder.mDeckLayout.setTag(holder);
 
         // set click listeners
-        holder.mDeckLayout.setOnClickListener(mDeckClickListener);
-        holder.mDeckLayout.setOnLongClickListener(mDeckLongClickListener);
+        //holder.mDeckLayout.setOnClickListener(mDeckClickListener);
+        //holder.mDeckLayout.setOnLongClickListener(mDeckLongClickListener);
 
         // if this deck is the current deck, highlight it
         //  if (node.did == getCol().getDecks().current().optLong("id")) {
 //                mDeckListView.setItemChecked(mOldDeckList.size(), true); // TODO
         //   }
+    }
+
+    /* For the expanding animation, which shows some options.
+    * as seen in http://stackoverflow.com/questions/29055946/expanding-recyclerview-item*/
+    @Override
+    public void onClick(final View v) {
+        final ViewHolder vh = (ViewHolder) v.getTag();
+        vh.mIsExpanded = !vh.mIsExpanded;
+        vh.setIsRecyclable(!vh.mIsExpanded);
+
+        vh.mDeckOptions.setVisibility(vh.mIsExpanded ? View.VISIBLE : View.GONE);
+        if (mOriginalHeight == 0) {
+            mOriginalHeight = v.getHeight();
+        }
+        final int extraHeight = (int) (mOriginalHeight * 1.2);
+        ValueAnimator valueAnimator;
+        if (v.getHeight() < (mOriginalHeight + extraHeight)) {
+            valueAnimator = ValueAnimator.ofInt(mOriginalHeight, mOriginalHeight + extraHeight);
+        } else {
+            valueAnimator = ValueAnimator.ofInt(mOriginalHeight + extraHeight, mOriginalHeight);
+        }
+        final int animDuration = 150;
+        valueAnimator.setDuration(animDuration);
+        valueAnimator.setInterpolator(new LinearInterpolator());
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Integer value = (Integer) animation.getAnimatedValue();
+                v.getLayoutParams().height = value;
+                v.requestLayout();
+            }
+        });
+        float start = 0.f;
+        float end = 1.f;
+
+        if (!vh.mIsExpanded) { //mIsExpanded is true if the user clicked to expand.
+            float aux = end;
+            end = start;
+            start = aux;
+        }
+
+        AlphaAnimation alpha = new AlphaAnimation(start, end);
+        alpha.setDuration(animDuration); // Make animation instant
+        alpha.setFillAfter(true); // Tell it to persist after the animation ends
+        vh.mDeckOptions.startAnimation(alpha);
+
+        valueAnimator.start();
     }
 
     @Override
