@@ -14,6 +14,7 @@ import com.ichi2.anki.R;
 import com.ichi2.libanki.*;
 import com.nineoldandroids.animation.ValueAnimator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import timber.log.Timber;
@@ -30,7 +31,6 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> im
     private View.OnClickListener mDeckExpanderClickListener;
     private View.OnLongClickListener mDeckLongClickListener;
     private Context mContext;
-    private int mOriginalHeight = 0;
 
     // ViewHolder class to save inflated views for recycling
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -41,6 +41,7 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> im
         public LinearLayout mDeckOptions;
 
         public boolean mIsExpanded;
+        public int mOriginalHeight;
 
         public ViewHolder(View v) {
             super(v);
@@ -52,6 +53,7 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> im
             mDeckRev = (TextView) v.findViewById(R.id.deckpicker_rev);
             mDeckOptions = (LinearLayout) v.findViewById(R.id.deck_picker_options);
             mIsExpanded = false;
+            mOriginalHeight = 0;
         }
     }
 
@@ -149,19 +151,25 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> im
     @Override
     public void onClick(final View v) {
         final ViewHolder vh = (ViewHolder) v.getTag();
+        animateItemExpansion(vh);
+    }
+
+    private void animateItemExpansion(ViewHolder vh) {
+        final View v = vh.itemView;
         vh.mIsExpanded = !vh.mIsExpanded;
         vh.setIsRecyclable(!vh.mIsExpanded);
 
         vh.mDeckOptions.setVisibility(vh.mIsExpanded ? View.VISIBLE : View.GONE);
-        if (mOriginalHeight == 0) {
-            mOriginalHeight = v.getHeight();
+
+        if (vh.mOriginalHeight == 0) {
+            vh.mOriginalHeight = v.getHeight();
         }
-        final int extraHeight = (int) (mOriginalHeight * 1.2);
+        final int extraHeight = (int) (vh.mOriginalHeight * .5);
         ValueAnimator valueAnimator;
-        if (v.getHeight() < (mOriginalHeight + extraHeight)) {
-            valueAnimator = ValueAnimator.ofInt(mOriginalHeight, mOriginalHeight + extraHeight);
+        if (v.getHeight() < (vh.mOriginalHeight + extraHeight)) {
+            valueAnimator = ValueAnimator.ofInt(vh.mOriginalHeight, vh.mOriginalHeight + extraHeight);
         } else {
-            valueAnimator = ValueAnimator.ofInt(mOriginalHeight + extraHeight, mOriginalHeight);
+            valueAnimator = ValueAnimator.ofInt(vh.mOriginalHeight + extraHeight, vh.mOriginalHeight);
         }
         final int animDuration = 150;
         valueAnimator.setDuration(animDuration);
@@ -189,6 +197,7 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.ViewHolder> im
 
         valueAnimator.start();
     }
+
 
     @Override
     public int getItemCount() {
